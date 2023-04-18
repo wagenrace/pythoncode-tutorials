@@ -17,7 +17,7 @@ N_THREADS = 200
 q = Queue()
 print_lock = Lock()
 
-def port_scan(port):
+def port_scan(host, port):
     """
     Scan a port on the global variable `host`
     """
@@ -40,7 +40,7 @@ def scan_thread():
         # get the port number from the queue
         worker = q.get()
         # scan that port number
-        port_scan(worker)
+        port_scan(*worker)
         # tells the queue that the scanning for that port 
         # is done
         q.task_done()
@@ -56,10 +56,10 @@ def main(host, ports):
         # start the daemon thread
         t.start()
 
-    for worker in ports:
+    for port in ports:
         # for each port, put that port into the queue
         # to start scanning
-        q.put(worker)
+        q.put((host, port))
     
     # wait the threads ( port scanners ) to finish
     q.join()
